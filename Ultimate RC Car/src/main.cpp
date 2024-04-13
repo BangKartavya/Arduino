@@ -1,9 +1,8 @@
 #include <Arduino.h>
-#include <BluetoothSerial.h>
+
 int ch1_pin = 16; // channel 1
 int ch2_pin = 27; // channel 2
 
-BluetoothSerial serialBT;
 
 // Left Motor Driver
 
@@ -33,14 +32,11 @@ int Ch1Ch2_start_Fwd = 1550;
 int Ch1Ch2_End_Fwd = 2030;
 // BACK
 int Ch1Ch2_start_Bac = 1450;
-int Ch1Ch2_End_Bac = 1000;
+int Ch1Ch2_End_Bac = 980;
 
-char temp;
 
 void setup() {
   Serial.begin(115200); // to monitor the outputs
-  serialBT.begin("Ravenclaw");
-  temp = 'S';
 
   // Set Trig pin to output and Echo pin to input
 
@@ -82,147 +78,166 @@ void loop() {
   Serial.println(ch2);
   Serial.println("");
 
+
   // setting the corresponding analog values
-  while (!serialBT.hasClient()) {
-    int ch1_forward_speed =  map(ch1,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255);
-    int ch2_forward_speed =  map(ch2,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255);
-    
-    int ch1_backward_speed =  map(ch1,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255);
-    int ch2_backward_speed =  map(ch2,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255);
-    
-    if (ch1 == 0 || ch2 == 0) {
-      // analogWrite(R_PWM_right, 0);
-      // analogWrite(L_PWM_right, 0);
-      // analogWrite(R_PWM_left, 0);
-      // analogWrite(L_PWM_left, 0);
-
-      // if one or both channels are disconnected (use the distance sensor)
-      digitalWrite(TRIG,HIGH);
-      delayMicroseconds(10);
-      digitalWrite(TRIG,LOW);
-      
-      int DUR = pulseIn(ECHO,HIGH);
-      double DIST = (0.0343*DUR)/2;
-      
-      // Serial.println("Duration : "+String(dur) + "\tDistance : "+String(dist));
-
-      if(DIST>THRESHOLD) {
-        // Move the car forward as the owner is far away
-        analogWrite(R_PWM_right,100);
-        analogWrite(R_PWM_left,100);
-      }
-
-      if(DIST<THRESHOLD) {
-        //Move the car back as it got too close
-        analogWrite(L_PWM_left,100);
-        analogWrite(L_PWM_right,100);
-      }
-
-
-
-    }
-
-    // Going Forward
-    else if ((ch1 > Ch1Ch2_start_Fwd && ch2 > Ch1Ch2_start_Fwd)) {
-      // spin both left and right motors clockwise
-      analogWrite(R_PWM_right, ch2_forward_speed);
-      analogWrite(R_PWM_left, ch1_forward_speed);
-
-      analogWrite(L_PWM_right, 0);
-      analogWrite(L_PWM_left, 0);
-    }
-    // Going Right
-
-    // else if (ch1 > Ch1Ch2_start_Fwd && ch2 < Ch1Ch2_start_Bac) {
-    //   // spin right motor anti clock and left motor clock
-    //   analogWrite(L_PWM_right, forward_speed);
-    //   analogWrite(R_PWM_left, forward_speed);
-
-    //   analogWrite(L_PWM_left, 0);
-    //   analogWrite(R_PWM_right, 0);
-    // }
-    // Going Left
-
-    // else if (ch1 < Ch1Ch2_start_Bac && ch2 > Ch1Ch2_start_Fwd) {
-    //   // spin left motor anti clock and right motor clock;
-    //   analogWrite(R_PWM_right, backward_speed);
-    //   analogWrite(L_PWM_left, backward_speed);
-
-    //   analogWrite(R_PWM_left, 0);
-    //   analogWrite(L_PWM_right, 0);
-    // }
-    // Going Back
-    else if (ch1 < Ch1Ch2_start_Bac && ch2 < Ch1Ch2_start_Bac) {
-      // spin both motors anti clock
-      analogWrite(L_PWM_left, ch2_backward_speed);
-      analogWrite(L_PWM_right, ch1_backward_speed);
-
-      analogWrite(R_PWM_right, 0);
-      analogWrite(R_PWM_left, 0);
-    } 
-    else {
-      // stop the car
-      analogWrite(R_PWM_right, 0);
-      analogWrite(L_PWM_right, 0);
-      analogWrite(R_PWM_left, 0);
-      analogWrite(L_PWM_left, 0);
-
-      // Unexpected thing happen
-    }
+  int ch1_forward_speed =  map(ch1,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255);
+  int ch2_forward_speed =  map(ch2,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255);
+  
+  int ch1_backward_speed =  map(ch1,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255);
+  int ch2_backward_speed =  map(ch2,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255);
+  
+  if (ch1 == 0 || ch2 == 0) {
+    analogWrite(R_PWM_right, 0);
+    analogWrite(L_PWM_right, 0);
+    analogWrite(R_PWM_left, 0);
+    analogWrite(L_PWM_left, 0);
   }
-  if (serialBT.available()) {
 
-    int forward_speed = 150;
-    int backward_speed = 150;
+  // Going Forward
+  else if ((ch1 > Ch1Ch2_start_Fwd && ch2 > Ch1Ch2_start_Fwd)) {
+    // spin both left and right motors clockwise
+
+    analogWrite(R_PWM_right, ch2_forward_speed);
+    analogWrite(R_PWM_left, ch1_forward_speed);
+
+    analogWrite(L_PWM_right, 0);
+    analogWrite(L_PWM_left, 0);
+  }
+  // Going Right
+
+  else if (ch1 > Ch1Ch2_start_Fwd && ch2 < Ch1Ch2_start_Bac) {
+    // spin right motor anti clock and left motor clock
+    analogWrite(L_PWM_right, ch1_forward_speed);
+    analogWrite(R_PWM_left, ch1_forward_speed);
+
+    analogWrite(L_PWM_left, 0);
+    analogWrite(R_PWM_right, 0);
+  }
+  // Going Left
+
+  else if (ch1 < Ch1Ch2_start_Bac && ch2 > Ch1Ch2_start_Fwd) {
+    // spin left motor anti clock and right motor clock;
+    analogWrite(R_PWM_right, ch1_backward_speed);
+    analogWrite(L_PWM_left, ch1_backward_speed);
+
+    analogWrite(R_PWM_left, 0);
+    analogWrite(L_PWM_right, 0);
+  }
+  
+  // Going Back
+  else if ((ch1 < Ch1Ch2_start_Bac && ch1 > Ch1Ch2_End_Bac) && ch2 < Ch1Ch2_start_Bac) {
+    // spin both motors anti clock
+    analogWrite(L_PWM_left, ch2_backward_speed);
+    analogWrite(L_PWM_right, ch1_backward_speed);
+
+    analogWrite(R_PWM_right, 0);
+    analogWrite(R_PWM_left, 0);
+  } 
+  
+  // Forward Right
+  else if(ch1>Ch1Ch2_start_Fwd && (ch2 < 1.003*1500 && ch2 > 0.997*1500)) {
+    analogWrite(R_PWM_left,ch1_forward_speed);
+    analogWrite(R_PWM_right,ch1_forward_speed/2);
+
+    analogWrite(L_PWM_right,0);
+    analogWrite(L_PWM_left,0);
+  }
+  
+  // Forward Left
+  else if(ch2>Ch1Ch2_start_Fwd && (ch1 < 1.003*1500 && ch2 > 0.997*1500)) {
+    analogWrite(R_PWM_right,ch1_forward_speed);
+    analogWrite(R_PWM_left,ch1_forward_speed/2);
+
+    analogWrite(L_PWM_right,0);
+    analogWrite(L_PWM_left,0);
+  }
+  
+  // Backward Right
+  else if(ch2<Ch1Ch2_start_Bac && (ch1 < 1.003*1500 && ch1 > 0.997*1500)) {
+    analogWrite(L_PWM_left,ch1_backward_speed);
+    analogWrite(L_PWM_right,ch1_backward_speed/2);
+
+    analogWrite(R_PWM_right,0);
+    analogWrite(R_PWM_left,0);
+  }
+  
+  // Backward Left
+  else if((ch1 < Ch1Ch2_start_Bac && ch1 > Ch1Ch2_End_Bac) && (ch2 < 1.003*1500 && ch2 > 0.997*1500)) {
+    analogWrite(L_PWM_right,ch1_backward_speed);
+    analogWrite(L_PWM_left,ch1_backward_speed/2);
+
+    analogWrite(R_PWM_right,0);
+    analogWrite(R_PWM_left,0);
+  }
+
+
+  else if((ch1 < 1.003*900 && ch1 > 0.997*900) && (ch1 < 1.003*1500 && ch1 > 0.997*1500)) {
+    // Stick is in the middle stop the car
+    analogWrite(R_PWM_left,0);
+    analogWrite(R_PWM_right,0);
+    analogWrite(L_PWM_left,0);
+    analogWrite(L_PWM_right,0);
+  }
+
+  // Entered Failsafe mode - Activate the Sensor
+  else if(ch1 < 1.003*900 && ch1 > 0.997*900) {
+    digitalWrite(TRIG,HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG,LOW);
+
+    analogWrite(R_PWM_left,0);
+    analogWrite(R_PWM_right,0);
+    analogWrite(L_PWM_left,0);
+    analogWrite(L_PWM_right,0);
     
-    temp = serialBT.read();
+    int DUR = pulseIn(ECHO,HIGH);
+    double DIST = (0.0343*DUR)/2;
     
-    // Going Forward
+    Serial.println("Pulse Duration : ");
+    Serial.println('\t');
+    Serial.println(DUR);
+    Serial.println("Distance : ");
+    Serial.println('\t');
+    Serial.println(DIST);
 
-    if (temp == 'F') {
-      // spin both left and right motors clockwise
-      analogWrite(R_PWM_right, forward_speed);
-      analogWrite(R_PWM_left, forward_speed);
-
-      analogWrite(L_PWM_right, 0);
-      analogWrite(L_PWM_left, 0);
+    if(DIST==0.00) {
+      // Sensor Not Functional Stop the car
+      analogWrite(R_PWM_left,0);
+      analogWrite(R_PWM_right,0);
+      analogWrite(L_PWM_left,0);
+      analogWrite(L_PWM_right,0);
     }
-    // Going Right
 
-    else if (temp == 'R') {
-      // spin right motor anti clock and left motor clock
-      analogWrite(R_PWM_left, forward_speed);
-      analogWrite(L_PWM_right, forward_speed);
-
-      analogWrite(L_PWM_left, 0);
-      analogWrite(R_PWM_right, 0);
+    else if(DIST>THRESHOLD) {
+      // Move the car forward as the owner is far away
+      analogWrite(R_PWM_right,100);
+      analogWrite(R_PWM_left,100);
     }
-    // Going Left
 
-    else if (temp == 'L') {
-      // spin left motor anti clock and right motor clock;
-      analogWrite(R_PWM_right, backward_speed);
-      analogWrite(L_PWM_left, backward_speed);
-
-      analogWrite(R_PWM_left, 0);
-      analogWrite(L_PWM_right, 0);
+    else if(DIST<THRESHOLD) {
+      //Move the car back as it got too close
+      analogWrite(L_PWM_left,100);
+      analogWrite(L_PWM_right,100);
     }
-    // Going Back
-    else if (temp == 'B') {
-      // spin both motors anti clock
-      analogWrite(L_PWM_left, backward_speed);
-      analogWrite(L_PWM_right, backward_speed);
 
-      analogWrite(R_PWM_right, 0);
-      analogWrite(R_PWM_left, 0);
-    } else {
-      // stop the car
-      analogWrite(R_PWM_right, 0);
-      analogWrite(L_PWM_right, 0);
-      analogWrite(R_PWM_left, 0);
-      analogWrite(L_PWM_left, 0);
-
-      // Unexpected thing happen
+    if(DIST > (0.95*THRESHOLD) && (DIST < 1.05*THRESHOLD)) {
+      // The car is within reach, stop it
+      analogWrite(R_PWM_right,0);
+      analogWrite(R_PWM_left,0);
+      analogWrite(L_PWM_right,0);
+      analogWrite(L_PWM_left,0);
     }
+
+  }
+
+  // Failcase
+  else {
+    // stop the car
+    analogWrite(R_PWM_right, 0);
+    analogWrite(L_PWM_right, 0);
+    analogWrite(R_PWM_left, 0);
+    analogWrite(L_PWM_left, 0);
+
+    // Unexpected thing happen
   }
 }
