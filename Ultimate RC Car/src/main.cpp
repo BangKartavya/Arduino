@@ -25,7 +25,7 @@ int ECHO = 34;
 
 // Setting threshold distance
 
-double THRESHOLD = 30; 
+double THRESHOLD = 30; // Setting threshold distance to 30 cm, In future using a potentiometer to change the distance
 
 // FWD
 int Ch1Ch2_start_Fwd = 1550;
@@ -71,22 +71,15 @@ void loop() {
   int ch1 = pulseIn(ch1_pin, HIGH);
   int ch2 = pulseIn(ch2_pin, HIGH);
 
-  Serial.println("ch1 : ");
-  Serial.println(ch1);
-  Serial.println('\t');
-  Serial.println("ch2 : ");
-  Serial.println(ch2);
-  Serial.println("");
-
-
   // setting the corresponding analog values
-  int ch1_forward_speed =  map(ch1,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255);
-  int ch2_forward_speed =  map(ch2,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255);
+  int ch1_forward_speed =  map(ch1,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255); // map the speed to analog values for the motor
+  int ch2_forward_speed =  map(ch2,Ch1Ch2_start_Fwd,Ch1Ch2_End_Fwd,0,255); // map the speed to analog values for the motor
   
-  int ch1_backward_speed =  map(ch1,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255);
-  int ch2_backward_speed =  map(ch2,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255);
+  int ch1_backward_speed =  map(ch1,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255); // map the speed to analog values for the motor
+  int ch2_backward_speed =  map(ch2,Ch1Ch2_start_Bac,Ch1Ch2_End_Bac,0,255); // map the speed to analog values for the motor
   
   if (ch1 == 0 || ch2 == 0) {
+    // one or both channels disconnected so stop the car
     analogWrite(R_PWM_right, 0);
     analogWrite(L_PWM_right, 0);
     analogWrite(R_PWM_left, 0);
@@ -136,6 +129,7 @@ void loop() {
   
   // Forward Right
   else if(ch1>Ch1Ch2_start_Fwd && (ch2 < 1.003*1500 && ch2 > 0.997*1500)) {
+    // Spin both motors clockwise with left motor being faster than right
     analogWrite(R_PWM_left,ch1_forward_speed);
     analogWrite(R_PWM_right,ch1_forward_speed/2);
 
@@ -145,6 +139,7 @@ void loop() {
   
   // Forward Left
   else if(ch2>Ch1Ch2_start_Fwd && (ch1 < 1.003*1500 && ch2 > 0.997*1500)) {
+    // Spin both motors clockwise with left motor being slower than right
     analogWrite(R_PWM_right,ch1_forward_speed);
     analogWrite(R_PWM_left,ch1_forward_speed/2);
 
@@ -154,6 +149,7 @@ void loop() {
   
   // Backward Right
   else if(ch2<Ch1Ch2_start_Bac && (ch1 < 1.003*1500 && ch1 > 0.997*1500)) {
+    // Spin both motors anticlockwise with left motor being faster than right
     analogWrite(L_PWM_left,ch1_backward_speed);
     analogWrite(L_PWM_right,ch1_backward_speed/2);
 
@@ -163,6 +159,7 @@ void loop() {
   
   // Backward Left
   else if((ch1 < Ch1Ch2_start_Bac && ch1 > Ch1Ch2_End_Bac) && (ch2 < 1.003*1500 && ch2 > 0.997*1500)) {
+    // Spin both motors anticlockwise with left motor being slower than right
     analogWrite(L_PWM_right,ch1_backward_speed);
     analogWrite(L_PWM_left,ch1_backward_speed/2);
 
@@ -181,17 +178,20 @@ void loop() {
 
   // Entered Failsafe mode - Activate the Sensor
   else if(ch1 < 1.003*900 && ch1 > 0.997*900) {
-    digitalWrite(TRIG,HIGH);
-    delayMicroseconds(10);
-    digitalWrite(TRIG,LOW);
-
-    analogWrite(R_PWM_left,0);
+    // first stop the car to measure distance
+    analogWrite(R_PWM_left,0); 
     analogWrite(R_PWM_right,0);
     analogWrite(L_PWM_left,0);
     analogWrite(L_PWM_right,0);
     
+    //make the trigger pin high for 10 micro seconds
+    digitalWrite(TRIG,HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG,LOW);
+
+    // make the echo pin high and calculate the pulse duration
     int DUR = pulseIn(ECHO,HIGH);
-    double DIST = (0.0343*DUR)/2;
+    double DIST = (0.0343*DUR)/2; // calculate the distance
     
     Serial.println("Pulse Duration : ");
     Serial.println('\t');
