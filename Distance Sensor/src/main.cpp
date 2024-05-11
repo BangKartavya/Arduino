@@ -1,12 +1,12 @@
 #include <Arduino.h>
 
-int TRIG = 14;
-int ECHO = 27;
+int TRIG = 25;
+int ECHO = 33;
 
 void setup() {
   pinMode(TRIG,OUTPUT);
   pinMode(ECHO,INPUT);
-  digitalWrite(12,LOW);
+  digitalWrite(TRIG,LOW);
   Serial.begin(115200);
 }
 
@@ -19,6 +19,5 @@ void loop() {
   double dist = (0.0343*dur)/2;
   
   Serial.println("Duration : "+String(dur) + "\tDistance : "+String(dist));
-  
-  delay(500);
+  delay(50);
 }
