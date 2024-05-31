@@ -21,7 +21,7 @@ Usually RC cars only go in 4 directions, Forward, Backward, Left Turn and Right 
 
 ## Used By
 
-This project is used by the following companies:
+This project is used in the following competitions:
 
 - Ravenclaw Team for Techkriti 2024
 
