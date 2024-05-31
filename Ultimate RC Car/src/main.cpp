@@ -110,6 +110,7 @@ void backward_left(int ch1_backward_speed) {
 }
 
 void car_stop() {
+  // stop any motion
   analogWrite(R_PWM_left, 0);
   analogWrite(R_PWM_right, 0);
   analogWrite(L_PWM_left, 0);

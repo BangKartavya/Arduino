@@ -2,11 +2,11 @@
 #include <BluetoothSerial.h>
 
 BluetoothSerial serialBT;
-int L_PWM_LEFT ;
-int R_PWM_LEFT ;
+int L_PWM_LEFT = 27;
+int R_PWM_LEFT = 25;
 
-int L_PWM_RIGHT ;
-int R_PWM_RIGHT ;
+int R_PWM_RIGHT = 18;
+int L_PWM_RIGHT = 19;
 
 char dir;
 
@@ -21,6 +21,7 @@ void setup() {
 
   pinMode(R_PWM_LEFT,OUTPUT);
   pinMode(R_PWM_RIGHT,OUTPUT);
+
 }
 
 void fwd() {
@@ -48,8 +49,8 @@ void left() {
 }
 
 void right() {
-  digitalWrite(R_PWM_LEFT,LOW);
-  digitalWrite(R_PWM_RIGHT,HIGH);
+  digitalWrite(R_PWM_LEFT,HIGH);
+  digitalWrite(R_PWM_RIGHT,LOW);
   
   digitalWrite(L_PWM_LEFT,LOW);
   digitalWrite(L_PWM_RIGHT,HIGH);
@@ -65,7 +66,6 @@ void stp() {
 
 void loop() {
   while(!serialBT.hasClient()) {
-    Serial.println("No Connection");
     stp();
   }
 
