@@ -23,6 +23,7 @@ int ECHO = 34;
 // Setting threshold distance
 
 double THRESHOLD = 30; // Setting threshold distance to 30 cm, In future using a potentiometer to change the distance
+double ERROR = 10; // setting acceptable error
 
 // FWD
 int Ch1Ch2_start_Fwd = 1550;
@@ -226,9 +227,9 @@ void loop() {
     double DIST = ultrasonicRead(TRIG,ECHO); // Call the ultrasonicRead function to get the distance from the left sensor
 
     if(DIST == 0.00) car_stop();
-    else if(DIST > THRESHOLD - 5 && DIST < THRESHOLD + 5) car_stop();
-    else if(DIST > THRESHOLD + 5) backward(50,50);
-    else if(DIST < THRESHOLD - 5) forward(50,50);
+    else if(DIST > THRESHOLD - ERROR && DIST < THRESHOLD + ERROR) car_stop();
+    else if(DIST > THRESHOLD + ERROR) backward(25,25);
+    else if(DIST < THRESHOLD - ERROR) forward(25,25);
     else car_stop();
  
   }
