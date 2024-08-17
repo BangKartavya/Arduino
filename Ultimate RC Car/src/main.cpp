@@ -126,7 +126,7 @@ double ultrasonicRead(int TRIG,int ECHO) {
 }
 
 void setup() {
-  Serial.begin(115200); // to monitor the outputs
+  Serial.begin(9600); // to monitor the outputs
 
   // Set Trig pin to output and Echo pin to input
 
