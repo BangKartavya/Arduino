@@ -13,14 +13,12 @@ void setup() {
   Serial.begin(115200);
   pinMode(2,OUTPUT);
   pinMode(b1,INPUT_PULLUP);
-  attachInterrupt(b1,isr,FALLING);
+  attachInterrupt(b1,isr,RISING);
 }
 
 void loop() {
-  if(digitalRead(33)) {
+  if(!digitalRead(b1)) {
     digitalWrite(2,HIGH);
-    Serial.printf("Button has been pressed %u times",num);
-    Serial.println("");
     flag = false;
   }
   else digitalWrite(2,LOW);

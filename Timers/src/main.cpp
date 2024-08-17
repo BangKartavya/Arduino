@@ -1,11 +1,10 @@
 #include <Arduino.h>
 
-int LED = 13;
+int LED = 2;
 hw_timer_t *my_timer = NULL;
 
 void IRAM_ATTR onTimer() {
-  digitalWrite(LED,!digitalRead(LED));
-  Serial.println(millis());
+  digitalWrite(LED,!digitalRead(LED));  
 }
 
 
@@ -18,4 +17,6 @@ void setup() {
   timerAlarmEnable(my_timer);
 }
 
-void loop() {}
+void loop() {
+  Serial.println(millis());
+}
