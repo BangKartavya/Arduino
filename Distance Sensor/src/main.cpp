@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 int TRIG = 25;
-int ECHO = 33;
+int ECHO = 34;
 
 void setup() {
   pinMode(TRIG,OUTPUT);

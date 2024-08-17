@@ -18,13 +18,8 @@ int R_PWM_right = 15; // pwm pins
 int L_PWM_right = 13; // pwm pins
 
 // Ultrasonic Sensor Pins
-
-int TRIG_LEFT = 12;
-int ECHO_LEFT = 34;
-
-int TRIG_RIGHT ;
-int ECHO_RIGHT ;
-
+int TRIG = 25;
+int ECHO = 34;
 // Setting threshold distance
 
 double THRESHOLD = 30; // Setting threshold distance to 30 cm, In future using a potentiometer to change the distance
@@ -134,16 +129,13 @@ void setup() {
 
   // Set Trig pin to output and Echo pin to input
 
-  pinMode(TRIG_LEFT, OUTPUT);
-  pinMode(ECHO_LEFT, INPUT);
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
 
-  pinMode(TRIG_RIGHT, OUTPUT);
-  pinMode(ECHO_RIGHT, INPUT);
 
   // To make sure that trig is low before operation
 
-  digitalWrite(TRIG_LEFT, LOW);
-  digitalWrite(TRIG_RIGHT, LOW);
+  digitalWrite(TRIG, LOW);
 
   pinMode(R_EN_left, OUTPUT);
   pinMode(R_EN_right, OUTPUT);
@@ -231,34 +223,14 @@ void loop() {
     // first stop the car to measure distance
     car_stop();
 
-    double DIST_LEFT = ultrasonicRead(TRIG_LEFT,ECHO_LEFT); // Call the ultrasonicRead function to get the distance from the left sensor
-    double DIST_RIGHT = ultrasonicRead(TRIG_RIGHT,ECHO_RIGHT); // Call the ultrasonicRead function to get the distance from the right sensor
+    double DIST = ultrasonicRead(TRIG,ECHO); // Call the ultrasonicRead function to get the distance from the left sensor
 
-    if (DIST_LEFT == 0.00 || DIST_RIGHT == 0.00) {
-      // Sensor Not Functional Stop the car
-      car_stop();
-    }
-
-    else if (DIST_LEFT > THRESHOLD && (DIST_RIGHT > (0.95 * THRESHOLD) && (DIST_RIGHT < 1.05 * THRESHOLD))) {
-      // Move the car right as the owner is more right than left
-      forward_right(100);
-    }
-
-    else if (DIST_RIGHT > THRESHOLD && (DIST_LEFT > (0.95 * THRESHOLD) && (DIST_LEFT < 1.05 * THRESHOLD))) {
-      // Move the car left as the owner is more left than right
-      forward_left(100);
-    }
-
-    else if (abs(DIST_LEFT-DIST_RIGHT) == 0.1 && (DIST_LEFT > (0.95 * THRESHOLD) && (DIST_LEFT < 1.05 * THRESHOLD))) {
-      // The car is within reach, stop it
-      car_stop();
-    }
-
-    else if (DIST_LEFT < THRESHOLD) {
-      // Move the car back as it got too close
-      backward(100,100);
-    }
-
+    if(DIST == 0.00) car_stop();
+    else if(DIST > THRESHOLD - 5 && DIST < THRESHOLD + 5) car_stop();
+    else if(DIST > THRESHOLD + 5) backward(50,50);
+    else if(DIST < THRESHOLD - 5) forward(50,50);
+    else car_stop();
+ 
   }
 
   // Failcase
