@@ -22,7 +22,7 @@ int TRIG = 25;
 int ECHO = 34;
 // Setting threshold distance
 
-double THRESHOLD = 30; // Setting threshold distance to 30 cm, In future using a potentiometer to change the distance
+double THRESHOLD = 20; // Setting threshold distance to 30 cm, In future using a potentiometer to change the distance
 double ERROR = 10; // setting acceptable error
 
 // FWD
@@ -162,6 +162,8 @@ void loop() {
   int ch1 = pulseIn(ch1_pin, HIGH);
   int ch2 = pulseIn(ch2_pin, HIGH);
 
+  Serial.println("CH1 : " + String(ch1) + " CH2 : " + String(ch2));
+
   // setting the corresponding analog values
   int ch1_forward_speed = map(ch1, Ch1Ch2_start_Fwd, Ch1Ch2_End_Fwd, 0,255); // map the speed to analog values for the motor
   int ch2_forward_speed = map(ch2, Ch1Ch2_start_Fwd, Ch1Ch2_End_Fwd, 0,255); // map the speed to analog values for the motor
@@ -225,6 +227,8 @@ void loop() {
     car_stop();
 
     double DIST = ultrasonicRead(TRIG,ECHO); // Call the ultrasonicRead function to get the distance from the left sensor
+
+    Serial.println("Distance : " + String(DIST));
 
     if(DIST == 0.00) car_stop();
     else if(DIST > THRESHOLD - ERROR && DIST < THRESHOLD + ERROR) car_stop();
